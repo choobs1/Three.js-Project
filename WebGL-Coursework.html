@@ -28,6 +28,12 @@
 		// Note: You can add your own here, e.g. to store the rendering mode.
 		var camera, scene, renderer, mesh, line, points;
 		let e, f, v;
+
+		//Variables for camera rotations.
+		let rotateLeft, rotateRight, rotateUp, rotateDown;
+		let focusPoint = new THREE.Vector3(0, 0, 0);
+
+		//Variables for camera translatiion.
 		let cameraX = 0;
 		let cameraY = 0;
 		let cameraZ = 0;
@@ -52,15 +58,14 @@
 			// Draw a helper grid in the x-z plane (note: y is up).
 			scene.add(new THREE.GridHelper(10, 20, 0xffffff));
 
-			// TASK: Draw a cube (requirement 1).
+			/*
+			*	TASK: Draw a cube (requirement 1).
+			*/ 
 			const geometry = new THREE.BoxGeometry();
-			//using phong material as the basic material isn't affected by lighting.
+			//Using phong material as the basic material isn't affected by lighting.
 			const material = new THREE.MeshPhongMaterial( {color:0x44aa88} );
 			mesh =  new THREE.Mesh( geometry, material );
 			scene.add( mesh );
-			// TASK: Visualise the axes of the global coordinate system (requirment 2).
-			const axeshelper = new THREE.AxesHelper(5)
-            scene.add(axeshelper)
 
 			//creating an edge line cube
 			const edges = new THREE.EdgesGeometry( geometry );
@@ -68,11 +73,21 @@
 				{ color: 0xffffff} ) );
 			
 			// Setting up geometry for the points
-			const neWmaterial = new THREE.PointsMaterial({
+			const newMaterial = new THREE.PointsMaterial({
 				color: 'red',
 				size: 0.2,
 			});
-			points = new THREE.Points( geometry,neWmaterial );
+			points = new THREE.Points( geometry,newMaterial );
+			
+			/*
+			*	TASK: Visualise the axes of the global coordinate system (requirment 2).
+			*/
+			const axeshelper = new THREE.AxesHelper(5)
+            scene.add(axeshelper)
+
+			/*
+			*	TASK: add more complex lighting for 'face' rendering mode (requirement 4).
+			*/
 			// Adding ligthing to reflect of the cube and thus create a 3D effect whilst rotation.
 			{
 				const color = 0xFFFFFF;
@@ -83,7 +98,6 @@
 			}
 			// Basic ambient lighting.
 			// scene.add(new THREE.AmbientLight(0xffffff));
-			// TASK: add more complex lighting for 'face' rendering mode (requirement 4).
 
 			// Set up the Web GL renderer.
 			renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -106,13 +120,18 @@
 
 		// Animation loop function. This function is called whenever an update is required.
 		function animate() {
-			// TASK: This is a good place for code that rotates your cube (requirement 3).
 			requestAnimationFrame( animate );
 
+			/*
+			*	TASK: Implement code to help with translating the camera.(Requirement 5).
+			*/
 			camera.translateX(cameraX);
             camera.translateY(cameraY);
             camera.translateZ(cameraZ);
 
+			/*
+			*	TASK: This is a good place for code that rotates your cube (requirement 3).
+			*/
 			if(f){
 				rotation(mesh);
 			}
@@ -122,6 +141,7 @@
 			if(v){
 				rotation(points);
 			}
+			
 			// Render the current scene to the screen.
 			renderer.render(scene, camera);
 		}
@@ -129,6 +149,10 @@
 		// Handle keyboard presses.
 		function handleKeyDown(event) {
 			switch (event.key) {
+
+				/*
+				* TASK: Adding code for render modes (Requirement 4).
+				*/
 				// Render modes.
 				case 'f': // f = face
 					//alert('TASK: add code for face render mode (requirement 4).');
@@ -160,9 +184,9 @@
 					f = false;
 					break;
 				
-				//For moving the camera:
-				
-				// TASK: add code for starting/stopping rotations (requirement 3).
+				/*
+				*	TASK: add code for starting/stopping rotations (requirement 3).
+				*/
 				case 'g':
 					//For starting rotations.
 					if(mesh.parent === scene){
@@ -196,6 +220,10 @@
 					}
 					break;
 			}
+
+			/*
+			* TASK: Implement code to help with translating the camera.(Requirement 5).
+			*/
 			switch(event.keyCode){
 				case 37: // left arrow = translate camera left
                     if (cameraX != -0.01) {
