@@ -20,7 +20,8 @@
 </head>
 
 <body>
-	<script src="three-r134.js"></script>
+	<script src = "three-r134.js"></script>
+	<script src = "OBJLoader.js"></script>
 	<script>
 		"use strict"; // https://stackoverflow.com/q/1335851/72470
 
@@ -30,6 +31,7 @@
 		let e, f, v;
 
 		//Variables for camera rotations.
+		let distance;
 		let rotateLeft, rotateRight, rotateUp, rotateDown;
 		let focusPoint = new THREE.Vector3(0, 0, 0);
 
@@ -37,6 +39,9 @@
 		let cameraX = 0;
 		let cameraY = 0;
 		let cameraZ = 0;
+
+		//Variables for the bunny.
+		let bunny, bunnyGeometry;
 
 		// Initialise the scene, and draw it for the first time.
 		init();
@@ -61,10 +66,22 @@
 			/*
 			*	TASK: Draw a cube (requirement 1).
 			*/ 
-			const geometry = new THREE.BoxGeometry();
+			const geometry = new THREE.BoxGeometry(2, 2, 2);
 			//Using phong material as the basic material isn't affected by lighting.
 			const material = new THREE.MeshPhongMaterial( {color:0x44aa88} );
-			mesh =  new THREE.Mesh( geometry, material );
+			/*
+			*	Texture Mapping (Requirement 7).
+			*/
+			let loader = new THREE.TextureLoader()
+			const material_map = [
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/posx.jpg') }),
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/negx.jpg') }),
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/posy.jpg') }), //top
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/negy.jpg') }), //bottom
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/posz.jpg') }),
+                    new THREE.MeshBasicMaterial({ map: loader.load('Yokohama/posz.jpg') }),
+                ];
+			mesh =  new THREE.Mesh( geometry, material_map );
 			scene.add( mesh );
 
 			//creating an edge line cube
@@ -78,7 +95,27 @@
 				size: 0.2,
 			});
 			points = new THREE.Points( geometry,newMaterial );
-			
+
+			/*
+			*	TASK: Load a mesh model from .obj (Requirement 8)
+			*/
+			let objLoader = new THREE.OBJLoader();
+			objLoader.load('bunny-5000.obj', function (object) {
+
+				object.traverse(function (child) {
+					if (child instanceof THREE.Mesh) {
+						bunnyGeometry = child.geometry;
+						bunnyGeometry.scale(2, 2, 2);
+						bunnyGeometry.translate(-0.5, 0, 0);
+					}
+				});
+
+				object.scale.set(0.2, 0.2, 0.2);
+				object.position.set(0, 0, 0);
+				bunny = object;
+				scene.add(bunny);
+			});
+
 			/*
 			*	TASK: Visualise the axes of the global coordinate system (requirment 2).
 			*/
@@ -105,7 +142,7 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.body.appendChild(renderer.domElement);
 
-			//renderer.render(scene, camera);
+			// renderer.render(scene, camera);
 
 			// Handle resizing of the browser window.
 			window.addEventListener('resize', handleResize, false);
@@ -130,18 +167,27 @@
             camera.translateZ(cameraZ);
 
 			/*
+			* TASK: Orbitting the camera in different directions(Requirement 6).
+			*/
+			orbitCamera();
+
+			/*
 			*	TASK: This is a good place for code that rotates your cube (requirement 3).
+			*   TASK: Adding rotation for the bunny (requirement 9).		
 			*/
 			if(f){
 				rotation(mesh);
+				rotation(bunny);
 			}
 			if(e){
 				rotation(line);
+				rotation(bunny);
 			}
 			if(v){
 				rotation(points);
+				rotation(bunny);
 			}
-			
+
 			// Render the current scene to the screen.
 			renderer.render(scene, camera);
 		}
@@ -198,13 +244,12 @@
 						e = true;
 					}
 					if(points.parent === scene){
-						//rotation(line);
 						v = true;
 					}
 					break;
 					break;
 				
-				case 's':
+				case 'h':
 					//For stopping roations.
 					if(mesh.parent === scene){
 						//rotation(mesh);
@@ -278,6 +323,61 @@
 						cameraZ = 0;
 					}
 					break;
+
+				/*
+				* TASK: Orbitting the camera in different directions(Requirement 6).
+				*/	
+				case 65: // a = orbit the camera left
+                        if (rotateLeft != true) {
+                            rotateLeft = true;
+                            rotateRight = false;
+                            cameraX = -0.04;
+                        }
+                        else {
+                            rotateLeft = false;
+                            cameraX = 0;
+                            cameraZ = 0;
+                        }
+                        break;
+
+                    case 68: // d = orbit the camera right
+                        if (rotateRight != true) {
+                            rotateRight = true;
+                            rotateLeft = false;
+                            cameraX = 0.04;
+                        }
+                        else {
+                            rotateRight = false;
+                            cameraX = 0;
+                            cameraZ = 0;
+                        }
+                        break;
+
+                    case 87: // w = orbit the camera upwards
+                        if (rotateUp != true) {
+                            rotateUp = true;
+                            rotateDown = false;
+                            cameraY = 0.04;
+                        }
+                        else {
+                            rotateUp = false;
+                            cameraY = 0;
+                            cameraZ = 0;
+                        }
+                        break;
+
+                    case 83: // s = orbit the camera downwards
+                        if (rotateDown != true) {
+                            rotateDown = true;
+                            rotateUp = false;
+                            cameraY = -0.04;
+                        }
+                        else {
+                            rotateDown = false;
+                            cameraY = 0;
+                            cameraZ = 0;
+                        }
+                        break;
 			}
 		}
 
@@ -287,10 +387,29 @@
 			objects.rotation.z += 0.01;
 		}
 
-		function rotationStop(object){
-			objects.rotation.x = 0;
-			objects.rotation.y = 0;
-			objects.rotation.z = 0;
+		function orbitCamera(){
+			/*
+			* TASK: Orbitting the camera in different directions(Requirement 6).
+			*/
+			if (rotateUp == true || rotateDown == true || rotateLeft == true || rotateRight == true) {
+                    camera.lookAt(focusPoint);
+                    // Correct distance of camera from object for accurate rotation
+                    if (camera.position.distanceTo(focusPoint) < distance) {
+                        cameraZ = 0.02;
+                    }
+                    else if (camera.position.distanceTo(focusPoint) > distance) {
+                        cameraZ = -0.02;
+                    }
+                    else {
+                        cameraZ = 0;
+                    }
+                }
+                else {
+                    // Correct the focus point of camera
+                    focusPoint.x += cameraX;
+                    focusPoint.y += cameraY;
+                    focusPoint.z += cameraZ;
+                }
 		}
 
 	</script>
