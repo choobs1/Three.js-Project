@@ -95,7 +95,7 @@
 				size: 0.2,
 			});
 			points = new THREE.Points( geometry,newMaterial );
-			//points for the bunny
+
 			/*
 			*	TASK: Load a mesh model from .obj (Requirement 8)
 			*/
@@ -115,17 +115,6 @@
 				bunny = object;
 				scene.add(bunny);
 			});
-
-			/*
-			*	Texture mapping for the bunny
-			*	Use the same logic as it was used for the cube.
-			*/
-			
-			//edges for the bunny model.
-
-
-			//points for the bunny model.
-
 
 			/*
 			*	TASK: Visualise the axes of the global coordinate system (requirment 2).
@@ -226,6 +215,14 @@
 					scene.remove( mesh );
 					scene.add( line );
 					scene.remove( points );
+					
+					// For the bunny
+					scene.remove(bunny);
+					let bunnyEdges = new THREE.EdgesGeometry(bunnyGeometry)
+					bunny = new THREE.LineSegments(bunnyEdges, new THREE.LineBasicMaterial({ color: 0x00FFFF, linewidth: 0.5 }));
+					bunny.scale.set(0.2, 0.2, 0.2);
+					scene.add(bunny);
+
 					e = true;
 					v = false;
 					f = false;
@@ -236,6 +233,13 @@
 					scene.remove( mesh );
 					scene.remove( line );
 					scene.add( points );
+
+					// For the bunny
+					scene.remove(bunny);
+					bunny = new THREE.Points(bunnyGeometry, new THREE.PointsMaterial({ size: 0.01, color: 0x00FFFF}));
+					bunny.scale.set(0.2, 0.2, 0.2);
+					scene.add(bunny);
+					
 					e = false;
 					v = true;
 					f = false;
@@ -257,7 +261,6 @@
 					if(points.parent === scene){
 						v = true;
 					}
-					break;
 					break;
 				
 				case 'h':
