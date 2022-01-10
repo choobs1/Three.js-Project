@@ -1,6 +1,4 @@
-<img src="\images\💻CM20219.png"
-     alt="Markdown Monster icon"
-     style="float: left; margin-right: 10px;" />
+![Banner](./images/banner.png)
 # WebGL Coursework
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/choobs1/choobs1)
 
