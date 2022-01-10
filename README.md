@@ -18,4 +18,7 @@ You may boot up the HTML file directly but the texture loading and the object lo
 
 ## Usage
 ![Banner](./images/carbon.png)
-        
+In the following code, you can see the various inputs allowed to user for interacting with the project. The functionalities available are :
+* Testing Render Modes
+* Translation of camera about the axes
+* Orbiting the camera
